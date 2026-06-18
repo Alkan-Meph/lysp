@@ -162,7 +162,7 @@ def compile_list(sexp: Sexp, ctx: Context) -> CompileResult:
                 stmts.extend(item_stmts)
                 elts.append(item_value)
             return stmts, ast.List(elts=elts, ctx=ast.Load())
-        case _:
+        case _:  # pragma: no cover
             raise TranspilationError(
                 "list expects (list ...)", line=sexp.line, col=sexp.col
             )

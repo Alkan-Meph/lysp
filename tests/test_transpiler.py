@@ -47,6 +47,8 @@ _INVALID_TESTS = {
     "(if 1 2 3 4)": "if expects (if <test> <then> <else>) at line 1:1",
     "()": "cannot compile empty form at line 1:1",
     "(+)": "op expects (<op> <expr> <expr>) at line 1:1",
+    "(nth)": "nth expects (nth <list> <index>)",
+    "(do)": "do expects (do ...)",
     "(hd)": "hd expects (hd <list>)",
     "(tl)": "tl expects (tl <list>)",
 }
