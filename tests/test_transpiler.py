@@ -33,6 +33,9 @@ f""",
     "(list (list 1) (list 2 3) (list (list)))": "[[1], [2, 3], [[]]]",
     "(nth (list 1 2 3) 1)": "[1, 2, 3][1]",
     "(nth (list 1 2 3) (+ 4 5))": "[1, 2, 3][4 + 5]",
+    "(do (print 1) (print 2))": "print(1)\nprint(2)",
+    "(print (do 1 2))": "1\nprint(2)",
+    "(do 1)": "1",
 }
 
 _INVALID_TESTS = {

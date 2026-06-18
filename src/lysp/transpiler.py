@@ -108,6 +108,23 @@ def compile_define(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def compile_do(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("do"), *forms]) if len(forms) > 0:
+            stmts = []
+            for form in forms[:-1]:
+                form_stmts, form_value = compile_form(form, ctx)
+                stmts.extend(form_stmts)
+                stmts.append(ast.Expr(form_value))
+            form_stmts, form_value = compile_form(forms[-1], ctx)
+            stmts.extend(form_stmts)
+            return stmts, form_value
+        case _:
+            raise TranspilationError(
+                "do expects (do ...)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_if(sexp: Sexp, ctx: Context) -> CompileResult:
     match sexp:
         case Sexp([Id("if"), test, then, else_]):
@@ -219,6 +236,7 @@ def make_env() -> Env:
         "lambda": compile_lambda,
         "define": compile_define,
         "if": compile_if,
+        "do": compile_do,
         "list": compile_list,
         "nth": compile_nth,
         "+": compile_binop(ast.Add()),
