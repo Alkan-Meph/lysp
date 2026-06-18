@@ -1,0 +1,8 @@
+(if (>= 1 1) (print "ok") (print "ko"))
+(print (- (+ 1 2) (+ 3 4)))
+((lambda (x) (print x)) 123)
+((if (= 1 1) print print) "hello")
+(if 1 (define x 1) (define x 2))
+(if ((lambda (x) (print"test")) 1) (print "ok") (print "ko"))
+
+(print (- -1 -2))

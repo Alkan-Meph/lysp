@@ -1,0 +1,57 @@
+[project]
+name = "lysp"
+version = "0.1.0"
+description = "A simple lisp transpiled into Python"
+readme = "README.md"
+authors = [
+    { name = "Alkan-Meph", email = "no@mail.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+lysp = "lysp.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.11.20,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.1.0",
+    "pydocstringformatter>=0.7.5",
+    "pytest>=9.1.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.17",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "RUF", "N", "RET", "ARG"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["lysp"]
+
+[tool.pydocstringformatter]
+write = true
+style = ["numpydoc"]
+max-line-length = 88
+numpydoc-section-order = true
+numpydoc-section-spacing = true
+numpydoc-name-type-spacing = true
+numpydoc-section-hyphen-length = true
+linewrap-full-docstring = true
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "--cov"
+
+[tool.coverage.run]
+source = ["lysp"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
