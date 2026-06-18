@@ -184,6 +184,33 @@ def compile_nth(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def compile_hd(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("hd"), list_]):
+            stmts, value = compile_form(list_, ctx)
+            subscript = ast.Subscript(
+                value=value, slice=ast.Constant(value=0), ctx=ast.Load()
+            )
+            return stmts, subscript
+        case _:
+            raise TranspilationError(
+                "hd expects (hd <list>)", line=sexp.line, col=sexp.col
+            )
+
+
+def compile_tl(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("tl"), list_]):
+            stmts, value = compile_form(list_, ctx)
+            slice_ = ast.Slice(lower=ast.Constant(value=1))
+            subscript = ast.Subscript(value=value, slice=slice_, ctx=ast.Load())
+            return stmts, subscript
+        case _:
+            raise TranspilationError(
+                "tl expects (tl <list>)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_call(sexp: Sexp, ctx: Context) -> CompileResult:
     match sexp:
         case Sexp([callee, *params]):
@@ -239,6 +266,8 @@ def make_env() -> Env:
         "do": compile_do,
         "list": compile_list,
         "nth": compile_nth,
+        "hd": compile_hd,
+        "tl": compile_tl,
         "+": compile_binop(ast.Add()),
         "-": compile_binop(ast.Sub()),
         "*": compile_binop(ast.Mult()),

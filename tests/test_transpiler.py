@@ -36,6 +36,8 @@ f""",
     "(do (print 1) (print 2))": "print(1)\nprint(2)",
     "(print (do 1 2))": "1\nprint(2)",
     "(do 1)": "1",
+    "(hd (list 1 2 3))": "[1, 2, 3][0]",
+    "(tl (list 1 2 3))": "[1, 2, 3][1:]",
 }
 
 _INVALID_TESTS = {
@@ -45,6 +47,8 @@ _INVALID_TESTS = {
     "(if 1 2 3 4)": "if expects (if <test> <then> <else>) at line 1:1",
     "()": "cannot compile empty form at line 1:1",
     "(+)": "op expects (<op> <expr> <expr>) at line 1:1",
+    "(hd)": "hd expects (hd <list>)",
+    "(tl)": "tl expects (tl <list>)",
 }
 
 
