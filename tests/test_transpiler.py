@@ -13,22 +13,26 @@ from lysp.transpiler import (
 )
 
 _VALID_TESTS = {
-    "(define x 1)": "x = 1\nx\n",
-    '(define s "hello")': "s = 'hello'\ns\n",
-    "(print (+ x 1))": "print(x + 1)\n",
-    "(print (if x 1 2))": "print(1 if x else 2)\n",
+    "(define x 1)": "x = 1\nx",
+    '(define s "hello")': "s = 'hello'\ns",
+    "(print (+ x 1))": "print(x + 1)",
+    "(print (if x 1 2))": "print(1 if x else 2)",
     "(if x (define x 1) (define x 2))": """if x:
     x = 1
     _lysp_0_ = x
 else:
     x = 2
     _lysp_0_ = x
-_lysp_0_
-""",
+_lysp_0_""",
     "(define f (lambda (x y) (+ x y)))": """def f(x, y):
     return x + y
-f
-""",
+f""",
+    "(list)": "[]",
+    "(list 1 2 3)": "[1, 2, 3]",
+    '(list 1 x "hello")': "[1, x, 'hello']",
+    "(list (list 1) (list 2 3) (list (list)))": "[[1], [2, 3], [[]]]",
+    "(nth (list 1 2 3) 1)": "[1, 2, 3][1]",
+    "(nth (list 1 2 3) (+ 4 5))": "[1, 2, 3][4 + 5]",
 }
 
 _INVALID_TESTS = {
@@ -55,7 +59,12 @@ def test_compile_module():
         return compile_module(program, ctx)
 
     for to_check, expected in _VALID_TESTS.items():
-        assert ast_to_str(_compile(to_check)) == expected
+        result = _compile(to_check)
+        assert ast_to_str(result) == expected
+        compile(
+            result, "<test>", "exec"
+        )  # check for internal inconsistencies like bad line or col
+
     for test, expected_message in _INVALID_TESTS.items():
         with pytest.raises(TranspilationError, match=re.escape(expected_message)):
             _compile(test)
