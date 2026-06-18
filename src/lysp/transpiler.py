@@ -135,6 +135,38 @@ def compile_if(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def compile_list(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("list"), *items]):
+            stmts = []
+            elts = []
+            for item in items:
+                item_stmts, item_value = compile_form(item, ctx)
+                stmts.extend(item_stmts)
+                elts.append(item_value)
+            return stmts, ast.List(elts=elts, ctx=ast.Load())
+        case _:
+            raise TranspilationError(
+                "list expects (list ...)", line=sexp.line, col=sexp.col
+            )
+
+
+def compile_nth(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("nth"), list_, index]):
+            list_stmts, list_value = compile_form(list_, ctx)
+            index_stmts, index_value = compile_form(index, ctx)
+            list_stmts.extend(index_stmts)
+            subscript = ast.Subscript(
+                value=list_value, slice=index_value, ctx=ast.Load()
+            )
+            return list_stmts, subscript
+        case _:
+            raise TranspilationError(
+                "nth expects (nth <list> <index>)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_call(sexp: Sexp, ctx: Context) -> CompileResult:
     match sexp:
         case Sexp([callee, *params]):
@@ -187,6 +219,8 @@ def make_env() -> Env:
         "lambda": compile_lambda,
         "define": compile_define,
         "if": compile_if,
+        "list": compile_list,
+        "nth": compile_nth,
         "+": compile_binop(ast.Add()),
         "-": compile_binop(ast.Sub()),
         "*": compile_binop(ast.Mult()),
@@ -231,4 +265,4 @@ def compile_module(program: Sexp, ctx: Context) -> ast.Module:
 
 
 def ast_to_str(tree: ast.AST) -> str:
-    return ast.unparse(tree) + "\n"
+    return ast.unparse(tree)

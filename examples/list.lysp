@@ -1,0 +1,11 @@
+(define l (list 1 2 3 4))
+
+(print (nth l 0))
+(print (nth l 1))
+(print (nth l 2))
+(print (nth l 3))
+
+(print (nth l -1))
+(print (nth l -2))
+(print (nth l -3))
+(print (nth l -4))
