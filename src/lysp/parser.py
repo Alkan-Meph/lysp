@@ -7,11 +7,9 @@ from .errors import LyspError
 __all__ = [
     "AST",
     "Id",
-    "Number",
     "ParsingError",
     "Sexp",
     "Stream",
-    "String",
     "parse_from_str",
     "parse_from_stream",
 ]
@@ -80,13 +78,8 @@ class Sexp(AST):
 
 
 @dataclass
-class Number(AST):
-    value: int
-
-
-@dataclass
-class String(AST):
-    value: str
+class Constant(AST):
+    value: int | str
 
 
 @dataclass
@@ -100,7 +93,7 @@ def is_number_start(current: str, next_: str | None) -> bool:
     )
 
 
-def parse_number(stream: Stream) -> Number:
+def parse_number(stream: Stream) -> Constant:
     line, col = stream.line, stream.col
     if (c := stream.peek()) is None or not is_number_start(c, stream.peek(1)):
         raise ParsingError(
@@ -112,10 +105,10 @@ def parse_number(stream: Stream) -> Number:
         stream.next()
         result = c
     result += stream.take_while(lambda c: c in string.digits)
-    return Number(value=int(result), line=line, col=col)
+    return Constant(value=int(result), line=line, col=col)
 
 
-def parse_string(stream: Stream) -> String:
+def parse_string(stream: Stream) -> Constant:
     line, col = stream.line, stream.col
     if stream.peek() != '"':
         raise ParsingError(
@@ -128,7 +121,7 @@ def parse_string(stream: Stream) -> String:
             "string must end with '\"'", line=stream.line, col=stream.col
         )
     stream.next()  # discard second "
-    return String(value=result, line=line, col=col)
+    return Constant(value=result, line=line, col=col)
 
 
 def parse_id(stream: Stream) -> Id:

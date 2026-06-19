@@ -3,12 +3,11 @@ import re
 import pytest
 
 from lysp.parser import (
+    Constant,
     Id,
-    Number,
     ParsingError,
     Sexp,
     Stream,
-    String,
     is_number_start,
     parse_form,
     parse_from_str,
@@ -95,7 +94,7 @@ def test_is_number_start():
 def test_parse_number():
     def check_parse(data):
         result = parse_number(Stream(data))
-        expected = Number(int(data))
+        expected = Constant(int(data))
         assert result == expected
 
     check_parse("0")
@@ -130,7 +129,7 @@ def test_parse_number():
 def test_parse_string():
     def check_parse(data):
         result = parse_string(Stream(data))
-        expected = String(data.replace('"', ""))  # will break after implementing \"
+        expected = Constant(data.replace('"', ""))  # will break after implementing \"
         assert result == expected
 
     check_parse('""')
@@ -175,15 +174,15 @@ def test_parse_id():
 
 def test_parse_sexp():
     assert parse_sexp(Stream("()")) == Sexp([])
-    assert parse_sexp(Stream("(123)")) == Sexp([Number(123)])
+    assert parse_sexp(Stream("(123)")) == Sexp([Constant(123)])
     assert parse_sexp(Stream('(id 123 "hello")')) == Sexp(
-        [Id("id"), Number(123), String("hello")]
+        [Id("id"), Constant(123), Constant("hello")]
     )
     assert parse_sexp(Stream('((id 123) "hello")')) == Sexp(
-        [Sexp([Id("id"), Number(123)]), String("hello")]
+        [Sexp([Id("id"), Constant(123)]), Constant("hello")]
     )
     assert parse_sexp(Stream('((id (123)) ("hello") ())')) == Sexp(
-        [Sexp([Id("id"), Sexp([Number(123)])]), Sexp([String("hello")]), Sexp([])]
+        [Sexp([Id("id"), Sexp([Constant(123)])]), Sexp([Constant("hello")]), Sexp([])]
     )
 
     with pytest.raises(ParsingError, match=re.escape("sexp must start with '('")):
@@ -205,8 +204,8 @@ def test_skip_blank():
 
 
 def test_parse_form():
-    assert parse_form(Stream("   123")) == Number(123)
-    assert parse_form(Stream('   "hello"')) == String("hello")
+    assert parse_form(Stream("   123")) == Constant(123)
+    assert parse_form(Stream('   "hello"')) == Constant("hello")
     assert parse_form(Stream("   id")) == Id("id")
     assert parse_form(Stream("   (id)")) == Sexp([Id("id")])
 
@@ -228,8 +227,8 @@ def test_parse_from_stream():
     result = parse_from_stream(stream)
     assert result == Sexp(
         [
-            Sexp([Id("a"), Number(1)]),
-            Sexp([Id("b"), Number(2)]),
+            Sexp([Id("a"), Constant(1)]),
+            Sexp([Id("b"), Constant(2)]),
         ]
     )
 
@@ -244,8 +243,8 @@ def test_parse_from_str():
     result = parse_from_str(src)
     assert result == Sexp(
         [
-            Sexp([Id("a"), Number(1)]),
-            Sexp([Id("b"), Number(2)]),
+            Sexp([Id("a"), Constant(1)]),
+            Sexp([Id("b"), Constant(2)]),
         ]
     )
 

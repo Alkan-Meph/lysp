@@ -3,7 +3,7 @@ import itertools
 from collections.abc import Callable
 
 from .errors import LyspError
-from .parser import AST, Id, Number, Sexp, String
+from .parser import AST, Constant, Id, Sexp
 
 __all__ = [
     "Context",
@@ -50,12 +50,8 @@ class Context:
         self._counter = itertools.count()
 
 
-def compile_number(number: Number) -> ast.Constant:
-    return ast.Constant(value=number.value)
-
-
-def compile_string(string: String) -> ast.Constant:
-    return ast.Constant(value=string.value)
+def compile_constant(constant: Constant) -> ast.Constant:
+    return ast.Constant(value=constant.value)
 
 
 def compile_id(id_: Id) -> ast.Name:
@@ -286,10 +282,8 @@ def make_env() -> Env:
 
 def compile_form(form: AST, ctx: Context) -> CompileResult:
     match form:
-        case Number():
-            return [], compile_number(form)
-        case String():
-            return [], compile_string(form)
+        case Constant():
+            return [], compile_constant(form)
         case Id():
             return [], compile_id(form)
         case Sexp([Id(head), *_]) if head in ctx.env:
