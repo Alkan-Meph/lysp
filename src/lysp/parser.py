@@ -6,6 +6,7 @@ from .errors import LyspError
 
 __all__ = [
     "AST",
+    "Constant",
     "Id",
     "ParsingError",
     "Sexp",
@@ -79,7 +80,7 @@ class Sexp(AST):
 
 @dataclass
 class Constant(AST):
-    value: int | str
+    value: int | str | bool | None
 
 
 @dataclass
@@ -124,14 +125,23 @@ def parse_string(stream: Stream) -> Constant:
     return Constant(value=result, line=line, col=col)
 
 
-def parse_id(stream: Stream) -> Id:
+_KEYWORDS = {
+    "null": None,
+    "true": True,
+    "false": False,
+}
+
+
+def parse_symbol(stream: Stream) -> Id | Constant:
     line, col = stream.line, stream.col
     if (c := stream.peek()) is None or c not in _ID_FIRST:
         c = "EOF" if c is None else c
         raise ParsingError(
-            f"id cannot start with '{c}'", line=stream.line, col=stream.col
+            f"symbol cannot start with '{c}'", line=stream.line, col=stream.col
         )
     result = stream.take_while(lambda c: c in _ID_ALPHABET)
+    if result in _KEYWORDS:
+        return Constant(value=_KEYWORDS[result], line=line, col=col)
     return Id(value=result, line=line, col=col)
 
 
@@ -172,7 +182,7 @@ def parse_form(stream: Stream) -> AST:
     if c == '"':
         return parse_string(stream)
     if c in _ID_FIRST:
-        return parse_id(stream)
+        return parse_symbol(stream)
 
     raise ParsingError(f"unexpected char '{c}'", line=stream.line, col=stream.col)
 

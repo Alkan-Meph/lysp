@@ -3,7 +3,7 @@
         (do
             (fn (nth l i))
             (_iter fn l (+ i 1)))
-        0)))
+        null)))
 
 (define iter (lambda (fn l) (_iter fn l 0)))
 

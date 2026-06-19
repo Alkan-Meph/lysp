@@ -12,10 +12,10 @@ from lysp.parser import (
     parse_form,
     parse_from_str,
     parse_from_stream,
-    parse_id,
     parse_number,
     parse_sexp,
     parse_string,
+    parse_symbol,
     skip_blank,
 )
 
@@ -151,25 +151,23 @@ def test_parse_string():
         check_parse('"hello')
 
 
-def test_parse_id():
-    def check_parse(data):
-        result = parse_id(Stream(data))
-        expected = Id(data)
-        assert result == expected
-
-    check_parse("+")
-    check_parse("id")
-    check_parse("hello-world")
-    check_parse("empty?")
+def test_parse_symbol():
+    assert parse_symbol(Stream("+")) == Id("+")
+    assert parse_symbol(Stream("id")) == Id("id")
+    assert parse_symbol(Stream("hello-world")) == Id("hello-world")
+    assert parse_symbol(Stream("empty?")) == Id("empty?")
+    assert parse_symbol(Stream("null")) == Constant(None)
+    assert parse_symbol(Stream("true")) == Constant(True)
+    assert parse_symbol(Stream("false")) == Constant(False)
 
     with pytest.raises(
-        ParsingError, match=re.escape("id cannot start with 'EOF' at line 1:1")
+        ParsingError, match=re.escape("symbol cannot start with 'EOF' at line 1:1")
     ):
-        check_parse("")
+        parse_symbol(Stream(""))
     with pytest.raises(
-        ParsingError, match=re.escape("id cannot start with '\\' at line 1:1")
+        ParsingError, match=re.escape("symbol cannot start with '\\' at line 1:1")
     ):
-        check_parse("\\")
+        parse_symbol(Stream("\\"))
 
 
 def test_parse_sexp():
