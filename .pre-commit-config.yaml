@@ -27,3 +27,9 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [pre-push]
+      - id: mdformat
+        name: mdformat
+        entry: uv run mdformat
+        language: system
+        types: [markdown]
+        stages: [pre-commit]

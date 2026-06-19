@@ -18,6 +18,8 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "mdformat>=1.0.0",
+    "mdformat-gfm>=1.0.0",
     "mypy>=2.1.0",
     "pre-commit>=4.6.0",
     "pydocstringformatter>=0.7.5",
