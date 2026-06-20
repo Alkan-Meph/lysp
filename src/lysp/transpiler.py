@@ -337,4 +337,4 @@ def compile_module(program: Sexp, ctx: Context) -> ast.Module:
 
 
 def ast_to_str(tree: ast.AST) -> str:
-    return ast.unparse(tree)
+    return ast.unparse(tree) + "\n"
