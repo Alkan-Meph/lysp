@@ -38,6 +38,9 @@ f""",
     "(do 1)": "1",
     "(hd (list 1 2 3))": "[1, 2, 3][0]",
     "(tl (list 1 2 3))": "[1, 2, 3][1:]",
+    "null?": "_lysp_null_question_",
+    "hello-world": "_lysp_hello_dash_world",
+    "+": "_lysp__plus_",
 }
 
 _INVALID_TESTS = {

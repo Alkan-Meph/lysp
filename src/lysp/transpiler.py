@@ -1,5 +1,6 @@
 import ast
 import itertools
+import keyword
 from collections.abc import Callable
 
 from .errors import LyspError
@@ -54,11 +55,40 @@ def compile_constant(constant: Constant) -> ast.Constant:
     return ast.Constant(value=constant.value)
 
 
+_SYMBOL_NAMES = {
+    "!": "bang",
+    "#": "hash",
+    "$": "dollar",
+    "%": "percent",
+    "&": "amp",
+    "*": "star",
+    "+": "plus",
+    ",": "comma",
+    "-": "dash",
+    ".": "dot",
+    "/": "slash",
+    ":": "colon",
+    ";": "semi",
+    "<": "lt",
+    "=": "eq",
+    ">": "gt",
+    "?": "question",
+    "@": "at",
+    "_": "underscore",
+    "`": "backtick",
+    "~": "tilde",
+}
+
+
+def mangle(name: str) -> str:
+    if name.isidentifier() and not keyword.iskeyword(name):
+        return name
+    result = "".join(f"_{_SYMBOL_NAMES[c]}_" if c in _SYMBOL_NAMES else c for c in name)
+    return f"_lysp_{result}"
+
+
 def compile_id(id_: Id) -> ast.Name:
-    # TODO: the Name returned must be a valid Python id. For example, `my-id`
-    #       is a valid id in Lysp but not in Python. Same for Python reserved
-    #       words like `for`, `in`, etc.
-    return ast.Name(id=id_.value)
+    return ast.Name(id=mangle(id_.value))
 
 
 def compile_lambda(sexp: Sexp, ctx: Context) -> CompileResult:
@@ -70,7 +100,7 @@ def compile_lambda(sexp: Sexp, ctx: Context) -> CompileResult:
                     raise TranspilationError(
                         "lambda params must be ids", line=param.line, col=param.col
                     )
-                args.append(ast.arg(arg=param.value))
+                args.append(ast.arg(arg=mangle(param.value)))
             stmts, value = compile_form(body, ctx)
             stmts.append(ast.Return(value=value))
             tmp = ctx.make_name()
@@ -90,6 +120,7 @@ def compile_define(sexp: Sexp, ctx: Context) -> CompileResult:
     match sexp:
         case Sexp([Id("define"), Id(name), body]):
             stmts, value = compile_form(body, ctx)
+            name = mangle(name)
             match stmts:
                 case [ast.FunctionDef() as fn]:
                     fn.name = name
