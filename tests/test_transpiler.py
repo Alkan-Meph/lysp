@@ -2,7 +2,8 @@ import re
 
 import pytest
 
-from lysp.parser import AST, parse_from_str
+from lysp.forms import AST
+from lysp.parser import parse_from_str
 from lysp.transpiler import (
     Context,
     InvalidFormError,

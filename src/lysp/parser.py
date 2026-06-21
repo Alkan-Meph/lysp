@@ -1,15 +1,11 @@
 import string
 from collections.abc import Callable
-from dataclasses import dataclass, field
 
 from .errors import LyspError
+from .forms import AST, Constant, Id, Sexp
 
 __all__ = [
-    "AST",
-    "Constant",
-    "Id",
     "ParsingError",
-    "Sexp",
     "Stream",
     "parse_from_str",
     "parse_from_stream",
@@ -65,27 +61,6 @@ class Stream:
             self.next()
             result.append(c)
         return "".join(result)
-
-
-@dataclass
-class AST:
-    line: int | None = field(default=None, kw_only=True, compare=False)
-    col: int | None = field(default=None, kw_only=True, compare=False)
-
-
-@dataclass
-class Sexp(AST):
-    value: list[AST] = field(default_factory=list)
-
-
-@dataclass
-class Constant(AST):
-    value: int | str | bool | None
-
-
-@dataclass
-class Id(AST):
-    value: str
 
 
 def is_number_start(current: str, next_: str | None) -> bool:

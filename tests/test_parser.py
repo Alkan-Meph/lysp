@@ -2,11 +2,9 @@ import re
 
 import pytest
 
+from lysp.forms import Constant, Id, Sexp
 from lysp.parser import (
-    Constant,
-    Id,
     ParsingError,
-    Sexp,
     Stream,
     is_number_start,
     parse_form,
