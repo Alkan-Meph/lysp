@@ -28,6 +28,14 @@ print(fact(5))
 print(fact(10))
 ```
 
+and gives:
+
+```bash
+$ uv run lysp examples/fact.lysp | python3
+120
+3628800
+```
+
 ### Iter
 
 ```lisp
@@ -59,6 +67,14 @@ def iter(fn, l):
     return _iter(fn, l, 0)
 iter
 iter(print, ['hello', 'world'])
+```
+
+and gives:
+
+```bash
+$ uv run lysp examples/list.lysp | python3
+hello
+world
 ```
 
 ## Install
