@@ -255,6 +255,24 @@ def compile_call(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def compile_apply(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("apply"), callee, *params]) if len(params) >= 1:
+            stmts, value = compile_form(callee, ctx)
+            args = []
+            for param in params:
+                param_stmts, param_value = compile_form(param, ctx)
+                stmts.extend(param_stmts)
+                args.append(param_value)
+            args[-1] = ast.Starred(value=args[-1], ctx=ast.Load())
+            call = ast.Call(func=value, args=args)
+            return stmts, call
+        case _:
+            raise TranspilationError(
+                "apply expects (apply fn ...)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_op(build: BuildFn) -> CompileFn:
     def _compile(sexp: Sexp, ctx: Context) -> CompileResult:
         match sexp:
@@ -295,6 +313,7 @@ def make_env() -> Env:
         "nth": compile_nth,
         "hd": compile_hd,
         "tl": compile_tl,
+        "apply": compile_apply,
         "+": compile_binop(ast.Add()),
         "-": compile_binop(ast.Sub()),
         "*": compile_binop(ast.Mult()),

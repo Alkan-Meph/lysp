@@ -43,6 +43,10 @@ f
     "null?": "_lysp_null_question_\n",
     "hello-world": "_lysp_hello_dash_world\n",
     "+": "_lysp__plus_\n",
+    "(apply f (list))": "f(*[])\n",
+    "(apply f 1 (list))": "f(1, *[])\n",
+    "(apply f (list 2 3))": "f(*[2, 3])\n",
+    "(apply f 1 2 (list 2 3))": "f(1, 2, *[2, 3])\n",
 }
 
 _INVALID_TESTS = {
@@ -56,6 +60,7 @@ _INVALID_TESTS = {
     "(do)": "do expects (do ...)",
     "(hd)": "hd expects (hd <list>)",
     "(tl)": "tl expects (tl <list>)",
+    "(apply)": "apply expects (apply fn ...)",
 }
 
 
