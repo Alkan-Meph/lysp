@@ -47,6 +47,10 @@ f
     "(apply f 1 (list))": "f(1, *[])\n",
     "(apply f (list 2 3))": "f(*[2, 3])\n",
     "(apply f 1 2 (list 2 3))": "f(1, 2, *[2, 3])\n",
+    "(append (list))": "[]\n",
+    "(append (list) (list) (list))": "[] + [] + []\n",
+    "(append (list 1 2) (list 3 4) (list 5))": "[1, 2] + [3, 4] + [5]\n",
+    "(append (append (list 1) (list 2)) (list 3))": "[1] + [2] + [3]\n",
 }
 
 _INVALID_TESTS = {
@@ -61,6 +65,7 @@ _INVALID_TESTS = {
     "(hd)": "hd expects (hd <list>)",
     "(tl)": "tl expects (tl <list>)",
     "(apply)": "apply expects (apply fn ...)",
+    "(append)": "append expects (append <list> ...)",
 }
 
 

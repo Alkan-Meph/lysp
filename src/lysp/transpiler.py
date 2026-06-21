@@ -195,6 +195,26 @@ def compile_list(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def compile_append(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("append"), *items]) if len(items) >= 1:
+            stmts = []
+            elts = []
+            for item in items:
+                item_stmts, item_value = compile_form(item, ctx)
+                stmts.extend(item_stmts)
+                elts.append(item_value)
+            # Fold left the items to produce ((x + y) + z) + ...
+            result = elts[0]
+            for elt in elts[1:]:
+                result = ast.BinOp(op=ast.Add(), left=result, right=elt)
+            return stmts, result
+        case _:
+            raise TranspilationError(
+                "append expects (append <list> ...)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_nth(sexp: Sexp, ctx: Context) -> CompileResult:
     match sexp:
         case Sexp([Id("nth"), list_, index]):
@@ -310,6 +330,7 @@ def make_env() -> Env:
         "if": compile_if,
         "do": compile_do,
         "list": compile_list,
+        "append": compile_append,
         "nth": compile_nth,
         "hd": compile_hd,
         "tl": compile_tl,
