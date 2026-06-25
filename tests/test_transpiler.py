@@ -52,6 +52,8 @@ f
     "(append (list) (list) (list))": "[] + [] + []\n",
     "(append (list 1 2) (list 3 4) (list 5))": "[1, 2] + [3, 4] + [5]\n",
     "(append (append (list 1) (list 2)) (list 3))": "[1] + [2] + [3]\n",
+    "(. sys argv)": "sys.argv\n",
+    "(. a b c d)": "a.b.c.d\n",
 }
 
 _INVALID_TESTS = {
@@ -67,6 +69,8 @@ _INVALID_TESTS = {
     "(tl)": "tl expects (tl <list>)",
     "(apply)": "apply expects (apply fn ...)",
     "(append)": "append expects (append <list> ...)",
+    "(.)": ". expects (. <expr> <id> ...)",
+    "(. obj)": ". expects (. <expr> <id> ...)",
 }
 
 

@@ -2,6 +2,7 @@ import ast
 import itertools
 import keyword
 from collections.abc import Callable
+from typing import TypeGuard
 
 from .errors import LyspError
 from .forms import AST, Constant, Id, Sexp
@@ -293,6 +294,25 @@ def compile_apply(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def all_ids(forms: list[AST]) -> TypeGuard[list[Id]]:
+    """Narrow a list of forms to a list of ids (all elements must be ids)."""
+    return all(isinstance(form, Id) for form in forms)
+
+
+def compile_attr(sexp: Sexp, ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("."), AST() as target, Id(attr), *attr_ids]) if all_ids(attr_ids):
+            stmts, base = compile_form(target, ctx)
+            result = ast.Attribute(value=base, attr=mangle(attr))
+            for attr_id in attr_ids:
+                result = ast.Attribute(value=result, attr=mangle(attr_id.value))
+            return stmts, result
+        case _:
+            raise TranspilationError(
+                ". expects (. <expr> <id> ...)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_op(build: BuildFn) -> CompileFn:
     def _compile(sexp: Sexp, ctx: Context) -> CompileResult:
         match sexp:
@@ -335,6 +355,7 @@ def make_env() -> Env:
         "hd": compile_hd,
         "tl": compile_tl,
         "apply": compile_apply,
+        ".": compile_attr,
         "+": compile_binop(ast.Add()),
         "-": compile_binop(ast.Sub()),
         "*": compile_binop(ast.Mult()),
