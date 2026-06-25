@@ -54,6 +54,7 @@ f
     "(append (append (list 1) (list 2)) (list 3))": "[1] + [2] + [3]\n",
     "(. sys argv)": "sys.argv\n",
     "(. a b c d)": "a.b.c.d\n",
+    "(import sys)": "import sys\nsys\n",
 }
 
 _INVALID_TESTS = {
@@ -71,6 +72,7 @@ _INVALID_TESTS = {
     "(append)": "append expects (append <list> ...)",
     "(.)": ". expects (. <expr> <id> ...)",
     "(. obj)": ". expects (. <expr> <id> ...)",
+    "(import)": "import expects (import <id>)",
 }
 
 

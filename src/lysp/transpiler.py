@@ -313,6 +313,19 @@ def compile_attr(sexp: Sexp, ctx: Context) -> CompileResult:
             )
 
 
+def compile_import(sexp: Sexp, _ctx: Context) -> CompileResult:
+    match sexp:
+        case Sexp([Id("import"), Id(name)]):
+            name = mangle(name)
+            id_ = ast.Name(id=name)
+            stmt = ast.Import(names=[ast.alias(name=name)])
+            return [stmt], id_
+        case _:
+            raise TranspilationError(
+                "import expects (import <id>)", line=sexp.line, col=sexp.col
+            )
+
+
 def compile_op(build: BuildFn) -> CompileFn:
     def _compile(sexp: Sexp, ctx: Context) -> CompileResult:
         match sexp:
@@ -356,6 +369,7 @@ def make_env() -> Env:
         "tl": compile_tl,
         "apply": compile_apply,
         ".": compile_attr,
+        "import": compile_import,
         "+": compile_binop(ast.Add()),
         "-": compile_binop(ast.Sub()),
         "*": compile_binop(ast.Mult()),
